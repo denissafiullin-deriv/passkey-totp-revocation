@@ -116,3 +116,11 @@ The project uses a `totp_verification` table with the following structure:
 - `last_attempt_at`: Timestamp
 - `status`: Enum ('active', 'verified', 'blocked')
 - `is_verified`: Boolean
+
+## To do
+
+1. Add cron job to remove outdated TOTPs
+2. Add tests
+3. Add OpenAPI documentation
+4. Add RLS (row level security)
+
