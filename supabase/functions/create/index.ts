@@ -6,11 +6,12 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'npm:@supabase/supabase-js'
 import { APIClient, SendEmailRequest } from 'npm:customerio-node'
+import { Database } from '../../database.types.ts'
 
 
 const TOTP_VALIDITY_MINUTES = 10
 
-const supabase = createClient(
+const supabase = createClient<Database>(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
