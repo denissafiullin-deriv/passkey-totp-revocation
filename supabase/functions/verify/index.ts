@@ -52,7 +52,7 @@ serve(async (req) => {
       .from('totp_verification')
       .select()
       .eq('user_id', userId)
-      .eq('status', 'active')
+      .eq('status', 'ACTIVE')
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(1)
@@ -68,14 +68,14 @@ serve(async (req) => {
     // Update attempt count and verify
     const newAttemptCount = totpRecord.attempt_count + 1
     const isBlocked = newAttemptCount >= MAX_TOTAL_ATTEMPTS
-    const isCorrect = totpRecord.totp_code === totp
+    const isCorrect = totpRecord.totp_code === Number(totp)
 
     const { error: updateError } = await supabase
       .from('totp_verification')
       .update({
         attempt_count: newAttemptCount,
         last_attempt_at: new Date().toISOString(),
-        status: isBlocked ? 'blocked' : (isCorrect ? 'verified' : 'active'),
+        status: isBlocked ? 'BLOCKED' : (isCorrect ? 'VERIFIED' : 'ACTIVE'),
         is_verified: isCorrect
       })
       .eq('id', totpRecord.id)
