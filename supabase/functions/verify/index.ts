@@ -6,11 +6,12 @@
 // verifyTOTP.ts
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'npm:@supabase/supabase-js'
+import { Database } from '../database.types.ts'
 
 const MAX_ATTEMPTS_PER_MINUTE = 3
 const MAX_TOTAL_ATTEMPTS = 5
 
-const supabase = createClient(
+const supabase = createClient<Database>(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
