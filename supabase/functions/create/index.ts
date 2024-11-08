@@ -101,7 +101,10 @@ serve(async (req) => {
     const emailData = await res.json();
 
     return new Response(
-      JSON.stringify({ success: "true" }),
+      JSON.stringify({ 
+        success: "true",
+        email_id: emailData?.id,
+      }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
