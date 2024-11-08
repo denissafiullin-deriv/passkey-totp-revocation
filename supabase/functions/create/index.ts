@@ -7,6 +7,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js";
 import { Database } from '../database.types.ts'
 
+const TOTP_CREATION_LIMIT_MINUTES = 10;
 const TOTP_VALIDITY_MINUTES = 10;
 
 const supabase = createClient<Database>(
@@ -63,6 +64,23 @@ serve(async (req) => {
         JSON.stringify({ error: "provided userId is not verified" }),
         { status: 400, headers: { "Content-Type": "application/json" } },
       );
+    }
+
+    // Check TOTP generation rate limit
+    const { data: lastCreatedAt } = await supabase
+      .from('totp_verification')
+      .select('created_at')
+      .eq('status', 'ACTIVE')
+      .eq('user_id', userId)
+      .order('created_at', {ascending: false})
+      .limit(1)
+      .single()
+
+    if (lastCreatedAt && Date.parse(String(lastCreatedAt?.created_at)) + TOTP_CREATION_LIMIT_MINUTES * 60000 > Date.now()) {
+      return new Response(
+        JSON.stringify({ error: 'TOTP can be generated once each 10 minutes.' }),
+        { status: 429, headers: { 'Content-Type': 'application/json' } }
+      )
     }
 
     // Generate 6-digit TOTP
